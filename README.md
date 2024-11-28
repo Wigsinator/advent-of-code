@@ -6,4 +6,4 @@ For 2024, I'm going to be doing Advent of Code in Go, because I've been meaning 
 
 ## Acknowledgements
 
-Many of the scripts I'm starting out with are taken with deep thanks from [Alex Chao's Advent of Code Go](https://github.com/alexchao26/advent-of-code-go) repository. 
+Everything in the `scripts/` and `util/` folders are taken from [Alex Chao's Advent of Code Go](https://github.com/alexchao26/advent-of-code-go) repository, modified to pull from the local package.

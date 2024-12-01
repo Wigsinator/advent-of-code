@@ -23,3 +23,8 @@ go.work.sum
 
 # env file
 .env
+
+# Advent of Code Copyrighted material
+
+prompt.md
+input.txt

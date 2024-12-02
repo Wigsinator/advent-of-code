@@ -1,3 +1,5 @@
+include .env
+
 # https://gist.github.com/prwhite/8168133
 help: ## Show this help
 	@ echo 'Usage: make <target>'
@@ -6,7 +8,9 @@ help: ## Show this help
 	@ grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 check-aoc-cookie:  ## ensures $AOC_SESSION_COOKIE env var is set
-	@ test $${AOC_SESSION_COOKIE?env var not set}
+ifndef AOC_SESSION_COOKIE
+	$(error AOC_SESSION_COOKIE is undefined)
+endif
 
 skeleton: ## make skeleton main(_test).go files, optional: $DAY and $YEAR
 	@ if [[ -n $$DAY && -n $$YEAR ]]; then \

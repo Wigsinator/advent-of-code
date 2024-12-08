@@ -41,8 +41,11 @@ func main() {
 
 func part1(input string) (sum int) {
   rules, updates := parseInput(input)
+  rules_cmp := func(a,b int) int {
+    return rules[[2]int{a,b}]
+  }
   for _, update := range updates {
-    if updateIsValid(rules, update) {
+    if slices.IsSortedFunc(update, rules_cmp) {
       sum += update[(len(update)-1)/2]
     }
   }
@@ -52,17 +55,12 @@ func part1(input string) (sum int) {
 
 func part2(input string) (sum int) {
   rules, updates := parseInput(input)
+  rules_cmp := func(a,b int) int {
+    return rules[[2]int{a,b}]
+  }
   for _, update := range updates {
-    if !updateIsValid(rules, update) {
-      slices.SortFunc(update, func(a,b int) int {
-        if slices.Contains(rules[a], b) {
-          return 1
-        } else if slices.Contains(rules[b], a) {
-          return -1
-        } else {
-          return 0
-        }
-      })
+    if !slices.IsSortedFunc(update, rules_cmp) {
+      slices.SortFunc(update, rules_cmp)
       sum += update[(len(update)-1)/2]
     }
   }
@@ -70,14 +68,14 @@ func part2(input string) (sum int) {
   return sum
 }
 
-func parseInput(input string) (rules map[int][]int, updates [][]int) {
+func parseInput(input string) (rules map[[2]int]int, updates [][]int) {
   inputs := strings.Split(input, "\n\n")
-  rules = make(map[int][]int)
+  rules = make(map[[2]int]int)
   for _, line := range strings.Split(inputs[0], "\n") {
     vals := strings.Split(line, "|")
-    val0 := cast.ToInt(vals[0])
-    val1 := cast.ToInt(vals[1])
-    rules[val1] = append(rules[val1], val0)
+    val_array := [2]int{cast.ToInt(vals[0]),cast.ToInt(vals[1])}
+    rules[[2]int{val_array[1],val_array[0]}] = 1
+    rules[val_array] = -1
   }
   for _, line := range strings.Split(inputs[1], "\n") {
     update := make([]int, 0)
@@ -89,6 +87,7 @@ func parseInput(input string) (rules map[int][]int, updates [][]int) {
   return rules, updates
 }
 
+/* DEPRECATED
 func updateIsValid(rules map[int][]int, update []int) bool {
   for i,val := range update[:len(update)-1] {
     if has_intersection(rules[val], update[i+1:]) {
@@ -113,3 +112,5 @@ func has_intersection(a []int, b []int) bool {
 
   return false
 }
+*/
+

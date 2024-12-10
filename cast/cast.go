@@ -14,6 +14,12 @@ import (
 func ToInt(arg interface{}) int {
 	var val int
 	switch arg.(type) {
+  case rune:
+    var err error
+    val, err = strconv.Atoi(string(arg.(rune)))
+    if err != nil {
+      panic("error converting rune to int" + err.Error())
+    }
 	case string:
 		var err error
 		val, err = strconv.Atoi(arg.(string))

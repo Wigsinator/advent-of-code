@@ -39,3 +39,5 @@ prompt: check-aoc-cookie ## get prompt, requires $AOC_SESSION_COOKIE, optional: 
 		go run scripts/cmd/prompt/main.go -cookie $(AOC_SESSION_COOKIE); \
 	fi
 
+all: check-aoc-cookie skeleton input prompt ## make skeleton get input and prompt, requires $AOC_SESSION_COOKIE, optional $DAY and $YEAR
+

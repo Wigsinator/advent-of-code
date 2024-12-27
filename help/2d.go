@@ -22,3 +22,12 @@ func (p Pos) Right() Pos {
 func (p Pos) Neighbors() []Pos {
   return []Pos{p.Up(), p.Down(), p.Left(), p.Right()}
 }
+
+func (p Pos) Scale(factor int) Pos {
+  return Pos{p.X * factor, p.Y * factor}
+}
+
+func Add(p1 Pos, p2 Pos) Pos {
+  return Pos{p1.X + p2.X, p1.Y + p2.Y}
+}
+

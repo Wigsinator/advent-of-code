@@ -1,12 +1,14 @@
 package help
 
+import "fmt"
+
 // Create Heaps such that cmp(parent, child) must be true
-type Heap[T any] struct {
+type Heap[T comparable] struct {
   data []T
   comp func(a,b T) bool
 }
 
-func NewHeap[T any](comp func(a,b T) bool) *Heap[T] {
+func NewHeap[T comparable](comp func(a,b T) bool) *Heap[T] {
   return &Heap[T]{comp: comp}
 }
 
@@ -28,6 +30,20 @@ func (h *Heap[T]) Pop() T {
   v := h.data[n]
   h.data = h.data[:n]
   return v
+}
+
+func (h *Heap[T]) Exists(v T) bool {
+  for _, el := range h.data {
+    if el == v { return true }
+  }
+  return false
+}
+
+func (h *Heap[T]) Visualize() (output string) {
+  for i := range h.Len() {
+    output += fmt.Sprint(h.data[i],", ")
+  }
+  return output
 }
 
 func (h *Heap[T]) swap(i, j int) {
@@ -57,7 +73,7 @@ func (h *Heap[T]) down() {
     }
     j := j1
     j2 := right(i)
-    if j2 < n && !h.comp(h.data[j2], h.data[j1]) {
+    if j2 < n && h.comp(h.data[j2], h.data[j1]) {
       j = j2
     }
     if !h.comp(h.data[j], h.data[i]) {

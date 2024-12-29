@@ -41,22 +41,7 @@ func main() {
 func part1(input string) int {
   walls, start, end, limit := parseInput(input)
 
-  // Find the distance between 2 neighbors
-  distance := func (s directionalPos, e Pos) (cost int, success bool) {
-    if walls[e] { return 0, false }
-    cost = 1
-    if ((s.direction % 2 == 0) && (e.Right() == s.Pos || e.Left() == s.Pos)) ||
-       ((s.direction % 2 == 1) && (e.Up() == s.Pos || e.Down() == s.Pos)) {
-      cost += 1000
-    }
-    if (s.direction == 0 && e.Up() == s.Pos)  || 
-       (s.direction == 1 && e.Right() == s.Pos)  ||
-       (s.direction == 2 && e.Down() == s.Pos)    ||
-       (s.direction == 3 && e.Left() == s.Pos) {
-      cost += 2000
-    }
-    return cost, true
-  }
+  distance := generateDistFunc(walls)
 
   draw := func(path []directionalPos) {
     drawMap(walls, path, limit)
@@ -73,7 +58,26 @@ func part1(input string) int {
 }
 
 func part2(input string) int {
-  return 0
+  walls, start, end, _ := parseInput(input)
+
+  distanceFunc := generateDistFunc(walls)
+  
+  cameFrom := djikstra(start,end, distanceFunc)
+  possibleVisits := make(map[Pos]bool)
+  possibleVisits[end] = true
+  currentList := cameFrom[directionalPos{end, 0}]
+  fmt.Println(currentList)
+  for len(currentList) != 0 {
+    nextList := make([]directionalPos,0)
+    for _, dPos := range currentList {
+      nextList = append(nextList, cameFrom[dPos]...)
+      possibleVisits[dPos.Pos] = true
+    }
+    currentList = nextList
+  
+  }
+
+  return len(possibleVisits)
 }
 
 func parseInput(input string) (walls map[Pos]bool, start directionalPos, end Pos, limit Pos) {
@@ -109,6 +113,26 @@ func (p directionalPos) OldNeighbors() []directionalPos {
   arr = append(arr, directionalPos{p.Up(), 0})
   arr = append(arr, directionalPos{p.Right(), 1})
   return arr
+}
+
+func generateDistFunc(walls map[Pos]bool) (func (s directionalPos, e Pos) (cost int, success bool)) {
+  distance := func (s directionalPos, e Pos) (cost int, success bool) {
+    if walls[e] { return 0, false }
+    cost = 1
+    if ((s.direction % 2 == 0) && (e.Right() == s.Pos || e.Left() == s.Pos)) ||
+       ((s.direction % 2 == 1) && (e.Up() == s.Pos || e.Down() == s.Pos)) {
+      cost += 1000
+    }
+    if (s.direction == 0 && e.Up() == s.Pos)  || 
+       (s.direction == 1 && e.Right() == s.Pos)  ||
+       (s.direction == 2 && e.Down() == s.Pos)    ||
+       (s.direction == 3 && e.Left() == s.Pos) {
+      cost += 2000
+    }
+    return cost, true
+  }
+
+  return distance
 }
 
 func (p directionalPos) Neighbors() []directionalPos {
@@ -186,4 +210,49 @@ func drawMap(walls map[Pos]bool, path []directionalPos, limit Pos) {
     }
     fmt.Println(lineString)
   }
+}
+
+func djikstra(start directionalPos, goal Pos, d distFunc) map[directionalPos][]directionalPos {
+
+  cameFrom := make(map[directionalPos][]directionalPos)
+  visited := make(map[directionalPos]bool)
+
+  distance := make(map[directionalPos]int)
+  distance[start] = 0
+
+  unvisited := help.NewHeap[directionalPos](func (a,b directionalPos) bool {return distance[a] < distance[b] })
+  unvisited.Push(start)
+
+  for unvisited.Len() > 0 {
+    current := unvisited.Pop()
+    visited[current] = true
+
+    for _, neighbor := range current.Neighbors() {
+      if visited[neighbor] { continue }
+      if neighbor.Pos == goal {
+        neighbor.direction = 0
+      }
+      dist, success := d(current, neighbor.Pos)
+      if !success {
+        continue
+      }
+      tentativeScore := distance[current] + dist
+      val, ok := distance[neighbor]
+      if !ok {
+        cameFrom[neighbor] = make([]directionalPos,0)
+        cameFrom[neighbor] = append(cameFrom[neighbor], current)
+        distance[neighbor] = tentativeScore
+        unvisited.Push(neighbor)
+      } else if tentativeScore == val {
+        cameFrom[neighbor] = append(cameFrom[neighbor], current)
+      } else if tentativeScore < val {
+        cameFrom[neighbor] = make([]directionalPos,0)
+        cameFrom[neighbor] = append(cameFrom[neighbor], current)
+        distance[neighbor] = tentativeScore
+      }
+    }
+    
+  }
+
+  return cameFrom
 }

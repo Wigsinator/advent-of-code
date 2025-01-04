@@ -6,9 +6,9 @@ import (
 
 type heuristic func(Pos) int
 
-type distance func(Pos, Pos) (int, bool)
+type aDistance func(Pos, Pos) (int, bool)
 
-func AStar(start Pos, goal Pos, h heuristic, d distance) []Pos { 
+func AStar(start Pos, goal Pos, h heuristic, d aDistance) []Pos { 
 
   cameFrom := make(map[Pos]Pos)
 

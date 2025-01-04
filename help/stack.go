@@ -5,7 +5,7 @@ type Stack[T any] struct {
 }
 
 func NewStack[T any]() (*Stack[T]) {
-  return &Stack[T]{nil}
+  return &Stack[T]{data:make([]T,0)}
 }
 
 func (s *Stack[T]) Push(v T) {
